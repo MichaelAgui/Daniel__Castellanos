@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tecnologías de apoyo y comunicación inclusiva para personas con discapacidad en el Hospital de Kennedy.">
+  <title>Interacción inclusiva · Hospital de Kennedy</title>
+  <link rel="shortcut icon" href="Imagenes/4700e0cf-3410-4232-a77e-bae047c36b6a.webp">
+
+  <style>
+    :root {
+      --azul: #07559b;
+      --azul-oscuro: #063b70;
+      --azul-claro: #dceeff;
+      --azul-borde: #8fc5f5;
+      --fondo: #f0f6fc;
+      --texto: #183153;
+      --texto-suave: #405570;
+      --blanco: #ffffff;
+      --radio: 16px;
+      --sombra: 0 4px 16px rgba(7, 85, 155, .12);
+      --escala: 1; /* tamaño de letra ajustable */
+    }
+
+    /* Modo alto contraste */
+    body.alto-contraste {
+      --azul: #000000;
+      --azul-oscuro: #000000;
+      --azul-claro: #ffffff;
+      --azul-borde: #000000;
+      --fondo: #ffffff;
+      --texto: #000000;
+      --texto-suave: #000000;
+    }
+    body.alto-contraste header,
+    body.alto-contraste footer { background: #000; color: #ffff00; }
+    body.alto-contraste .title,
+    body.alto-contraste footer * { color: #ffff00; }
+    body.alto-contraste .card,
+    body.alto-contraste .stat-card,
+    body.alto-contraste .trainer-card { border: 3px solid #000; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: calc(100% * var(--escala)); }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      background: var(--fondo);
+      color: var(--texto);
+    }
+
+    img { max-width: 100%; display: block; }
+
+    :focus-visible {
+      outline: 3px solid #ffb703;
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: absolute; left: 1rem; top: -4rem;
+      background: #ffb703; color: #000; padding: .75rem 1rem;
+      border-radius: 8px; font-weight: 700; z-index: 100;
+    }
+    .skip-link:focus { top: 1rem; }
+
+    .container { width: min(1100px, 100% - 2rem); margin-inline: auto; }
+
+    /* ---------- Barra de accesibilidad ---------- */
+    .a11y-bar {
+      background: var(--azul-oscuro);
+      color: #fff;
+      font-size: .9rem;
+    }
+    .a11y-bar .container {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+      align-items: center; justify-content: flex-end; padding-block: .4rem;
+    }
+    .a11y-bar span { margin-right: auto; opacity: .9; }
+    .a11y-bar button {
+      background: transparent; color: #fff;
+      border: 1px solid rgba(255,255,255,.6);
+      border-radius: 6px; padding: .3rem .7rem; cursor: pointer; font: inherit;
+    }
+    .a11y-bar button:hover,
+    .a11y-bar button[aria-pressed="true"] { background: #fff; color: var(--azul-oscuro); }
+
+    /* ---------- Header ---------- */
+    header {
+      background: linear-gradient(135deg, var(--azul), var(--azul-oscuro));
+      color: #fff;
+      padding: 2rem 0;
+    }
+    header .container {
+      display: flex; flex-wrap: wrap; gap: 1.25rem;
+      align-items: center; justify-content: space-between;
+    }
+    .title { margin: 0; font-size: clamp(1.6rem, 4vw, 2.4rem); color: #fff; }
+    .subtitle { margin: .25rem 0 0; opacity: .9; }
+
+    .header-buttons { display: flex; flex-wrap: wrap; gap: .75rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: #fff; color: var(--azul);
+      border: 2px solid var(--azul-borde);
+      padding: .7rem 1.1rem; border-radius: 10px;
+      font: inherit; font-weight: 600; text-decoration: none; cursor: pointer;
+      transition: background .2s, color .2s, transform .2s;
+    }
+    .btn:hover { background: var(--azul-borde); color: var(--azul-oscuro); transform: translateY(-2px); }
+
+    /* ---------- Navegación ---------- */
+    nav.main-nav { background: #fff; box-shadow: var(--sombra); position: sticky; top: 0; z-index: 50; }
+    nav.main-nav ul {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-wrap: wrap; gap: .25rem; justify-content: center;
+    }
+    nav.main-nav a {
+      display: block; padding: .8rem 1rem;
+      color: var(--azul); text-decoration: none; font-weight: 600;
+      border-bottom: 3px solid transparent;
+    }
+    nav.main-nav a:hover { border-color: var(--azul); }
+
+    /* ---------- Carrusel ---------- */
+    .carousel-container { padding-block: 2rem 1rem; }
+    .carousel {
+      position: relative; overflow: hidden;
+      border-radius: var(--radio); background: #fff;
+      border: 2px solid var(--azul-borde); box-shadow: var(--sombra);
+    }
+    .slide { display: none; margin: 0; }
+    .slide.activo { display: block; animation: aparecer .5s ease; }
+    .slide img {
+      width: 100%; height: clamp(220px, 45vw, 440px);
+      object-fit: contain; background: #fff;
+    }
+    .slide figcaption {
+      text-align: center; padding: .6rem 1rem;
+      background: var(--azul-claro); color: var(--texto); font-weight: 600;
+    }
+    @keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+
+    .prev, .next {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      border: none; background: var(--azul); color: #fff;
+      font-size: 1.2rem; cursor: pointer; z-index: 2;
+    }
+    .prev { left: .75rem; } .next { right: .75rem; }
+    .prev:hover, .next:hover { background: var(--azul-oscuro); }
+
+    .carousel-controls {
+      display: flex; justify-content: center; align-items: center; gap: .6rem; margin-top: .9rem;
+    }
+    .dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--azul); background: transparent; cursor: pointer; padding: 0;
+    }
+    .dot[aria-current="true"] { background: var(--azul); }
+    .pause-btn {
+      background: var(--azul); color: #fff; border: none;
+      border-radius: 8px; padding: .3rem .8rem; cursor: pointer; font: inherit;
+    }
+
+    /* ---------- Secciones ---------- */
+    section { padding-block: 2.5rem; }
+    h2.section-title {
+      text-align: center; color: var(--azul);
+      font-size: clamp(1.4rem, 3vw, 2rem); margin: 0 0 .5rem;
+    }
+    .section-lead { text-align: center; color: var(--texto-suave); margin: 0 auto 2rem; max-width: 60ch; }
+
+    .grid {
+      display: grid; gap: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .card {
+      background: var(--azul-claro);
+      border: 2px solid var(--azul-borde);
+      border-radius: var(--radio); padding: 1.5rem;
+      transition: transform .25s, box-shadow .25s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: var(--sombra); }
+    .card .icon { font-size: 2rem; line-height: 1; margin-bottom: .5rem; }
+    .card h3 { margin: 0 0 .5rem; color: var(--azul); font-size: 1.15rem; }
+    .card p { margin: 0; }
+
+    .training-intro { max-width: 800px; margin: 0 auto 2rem; }
+
+    .trainer-card {
+      background: #fff; border: 2px solid var(--azul-borde);
+      border-radius: var(--radio); padding: 1.5rem; text-align: center;
+      transition: transform .25s, box-shadow .25s;
+    }
+    .trainer-card:hover { transform: translateY(-4px); box-shadow: var(--sombra); }
+    .trainer-card img {
+      width: 150px; height: 150px; object-fit: cover;
+      border-radius: 50%; margin: 0 auto 1rem;
+      border: 4px solid var(--azul-claro); background: var(--azul-claro);
+    }
+    .trainer-card h4 { margin: 0 0 .5rem; color: var(--azul); font-size: 1.15rem; }
+    .trainer-card p { margin: 0; font-size: .95rem; color: var(--texto-suave); }
+
+    /* ---------- Estadísticas ---------- */
+    .stat-card {
+      background: #fff; border: 2px solid var(--azul-borde);
+      border-radius: var(--radio); padding: 1.5rem;
+    }
+    .stat-card h3 { margin: 0 0 .25rem; color: var(--azul); font-size: 1.05rem; }
+    .stat-number { font-size: 2.6rem; font-weight: 800; color: var(--azul); line-height: 1.1; }
+    .bar { height: 10px; background: var(--azul-claro); border-radius: 99px; margin: .6rem 0 .8rem; overflow: hidden; }
+    .bar > span { display: block; height: 100%; width: 0; background: var(--azul); border-radius: 99px; transition: width 1.2s ease; }
+    .stat-card p { margin: 0; font-size: .95rem; color: var(--texto-suave); }
+
+    /* ---------- Contacto / pie ---------- */
+    footer { background: var(--azul-oscuro); color: #fff; padding: 2rem 0; text-align: center; }
+    .social-icons { display: flex; justify-content: center; gap: 1rem; margin-bottom: 1rem; }
+    .social-icons a {
+      width: 52px; height: 52px; display: grid; place-items: center;
+      background: #fff; color: var(--azul); border-radius: 50%;
+      transition: transform .25s, background .25s;
+    }
+    .social-icons a:hover { transform: scale(1.12); background: var(--azul-borde); }
+    .social-icons svg { width: 26px; height: 26px; fill: currentColor; }
+    footer small { opacity: .85; }
+
+    /* ---------- Diálogo ---------- */
+    dialog {
+      border: none; border-radius: var(--radio); padding: 1.75rem;
+      max-width: 440px; width: calc(100% - 2rem); color: var(--texto);
+      box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    }
+    dialog::backdrop { background: rgba(6, 59, 112, .6); }
+    dialog h2 { margin-top: 0; color: var(--azul); }
+    dialog .actions { display: flex; gap: .75rem; justify-content: flex-end; flex-wrap: wrap; margin-top: 1.25rem; }
+    dialog .btn { border-color: var(--azul); }
+    dialog .btn.primario { background: var(--azul); color: #fff; }
+    dialog .btn.primario:hover { background: var(--azul-oscuro); color: #fff; }
+
+    /* ---------- Móvil y movimiento reducido ---------- */
+    @media (max-width: 600px) {
+      .a11y-bar .container { justify-content: center; }
+      .a11y-bar span { width: 100%; text-align: center; }
+      .header-buttons { width: 100%; }
+      .header-buttons .btn { flex: 1 1 100%; justify-content: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  <!-- Barra de accesibilidad -->
+  <div class="a11y-bar" role="region" aria-label="Opciones de accesibilidad">
+    <div class="container">
+      <span>Opciones de accesibilidad</span>
+      <button type="button" id="btn-menos" aria-label="Disminuir tamaño de letra">A−</button>
+      <button type="button" id="btn-mas" aria-label="Aumentar tamaño de letra">A+</button>
+      <button type="button" id="btn-contraste" aria-pressed="false">Alto contraste</button>
+      <button type="button" id="btn-leer" aria-pressed="false">🔊 Leer en voz alta</button>
+    </div>
+  </div>
+
+  <header>
+    <div class="container">
+      <div>
+        <h1 class="title">Interacción inclusiva</h1>
+        <p class="subtitle">Hospital de Kennedy · Atención para todas las personas</p>
+      </div>
+
+      <div class="header-buttons">
+        <button type="button" class="btn" id="btn-videollamada">📹 Videollamada</button>
+        <a class="btn" href="https://www.insor.gov.co" target="_blank" rel="noopener noreferrer">
+          🤟 Intérprete de Lengua de Señas
+          <span class="sr-only" style="position:absolute;left:-9999px">(se abre en una pestaña nueva)</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <nav class="main-nav" aria-label="Navegación principal">
+    <div class="container">
+      <ul>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#capacitacion">Capacitación</a></li>
+        <li><a href="#estadisticas">Estadísticas</a></li>
+        <li><a href="lengua-de-senas.html">Aprende señas</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main id="contenido">
+    <!-- Carrusel -->
+    <section class="carousel-container" aria-label="Galería de imágenes" style="padding-block:2rem 1rem">
+      <div class="container">
+        <div class="carousel" role="group" aria-roledescription="carrusel" aria-label="Imágenes sobre inclusión">
+          <figure class="slide activo" aria-roledescription="diapositiva" aria-label="1 de 3">
+            <img src="Imagenes/pngtree-international-day-of-the-deaf-for-deaf-persons-with-disabilities-png-image_6144386.png" alt="Ilustración del Día Internacional de las Personas Sordas" loading="eager">
+            <figcaption>Asistencia y apoyo a la comunidad sorda</figcaption>
+          </figure>
+          <figure class="slide" aria-roledescription="diapositiva" aria-label="2 de 3">
+            <img src="Imagenes/pngtree-sign-language-communication-for-the-deaf-and-the-disabled-png-image_6144939.png" alt="Personas comunicándose mediante lengua de señas" loading="lazy">
+            <figcaption>Comunicación inclusiva</figcaption>
+          </figure>
+          <figure class="slide" aria-roledescription="diapositiva" aria-label="3 de 3">
+            <img src="Imagenes/pngtree-international-day-of-the-deaf-for-persons-with-disabilities-png-image_6145614.png" alt="Ilustración sobre herramientas y accesibilidad para personas con discapacidad" loading="lazy">
+            <figcaption>Herramientas tecnológicas</figcaption>
+          </figure>
+
+          <button type="button" class="prev" aria-label="Imagen anterior">&#10094;</button>
+          <button type="button" class="next" aria-label="Imagen siguiente">&#10095;</button>
+        </div>
+
+        <div class="carousel-controls">
+          <button type="button" class="pause-btn" id="carousel-toggle" aria-label="Pausar carrusel">⏸ Pausar</button>
+          <div id="dots" style="display:flex;gap:.6rem"></div>
+        </div>
+        <p id="carousel-status" class="sr-only" aria-live="polite" style="position:absolute;left:-9999px"></p>
+      </div>
+    </section>
+
+    <!-- Servicios -->
+    <section id="servicios">
+      <div class="container">
+        <h2 class="section-title">Atención sin barreras</h2>
+        <p class="section-lead">Tecnología y acompañamiento humano para que cada paciente sea escuchado y comprendido.</p>
+
+        <div class="grid">
+          <article class="card">
+            <div class="icon" aria-hidden="true">🏥</div>
+            <h3>Asistencia en el Hospital de Kennedy</h3>
+            <p>Se implementa la ayuda de las TIC para apoyar a pacientes y médicos en la asistencia médica, facilitando la atención a personas con discapacidad.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon" aria-hidden="true">🤟</div>
+            <h3>Comunicación inclusiva</h3>
+            <p>Tecnologías que permiten a las personas con discapacidades auditivas y del habla comunicarse eficazmente con el personal médico.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon" aria-hidden="true">📱</div>
+            <h3>Herramientas tecnológicas para la atención</h3>
+            <p>Dispositivos como tabletas y aplicaciones que facilitan la interacción de los pacientes con el personal de salud, especialmente con quienes tienen discapacidad.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon" aria-hidden="true">🌐</div>
+            <h3>Accesibilidad web del hospital</h3>
+            <p>Sitio optimizado para personas con discapacidades auditivas y motoras, con lectura en voz alta y navegación con teclado.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon" aria-hidden="true">🎓</div>
+            <h3>Educación inclusiva</h3>
+            <p>Programas educativos para pacientes con discapacidad, con recursos audiovisuales y herramientas de accesibilidad.</p>
+          </article>
+
+          <article class="card">
+            <div class="icon" aria-hidden="true">🤖</div>
+            <h3>Asistencia virtual para pacientes</h3>
+            <p>Asistentes virtuales que responden dudas sobre citas, horarios y servicios mediante comandos de voz.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capacitación -->
+    <section id="capacitacion" style="background:#fff">
+      <div class="container">
+        <h2 class="section-title">Capacitación al personal sobre inclusión</h2>
+        <p class="section-lead training-intro">Programas para que el personal interactúe de manera efectiva con personas con discapacidad auditiva, del habla y movilidad reducida.</p>
+
+        <div class="grid">
+          <article class="trainer-card">
+            <img src="Imagenes/black-and-white-1282264_1280.jpg" alt="Retrato de Juan Pérez" loading="lazy">
+            <h4>Juan Pérez</h4>
+            <p>Más de 10 años de experiencia en la inclusión de personas con discapacidades auditivas y del habla.</p>
+          </article>
+
+          <article class="trainer-card">
+            <img src="Imagenes/akdjlasjdlas.jpg" alt="Retrato de Karen Buitrago" loading="lazy">
+            <h4>Karen Buitrago</h4>
+            <p>Especialista en integración tecnológica para personas con discapacidad; ofrece capacitaciones sobre accesibilidad digital.</p>
+          </article>
+
+          <article class="trainer-card">
+            <img src="Imagenes/saaasas.webp" alt="Retrato de Carlos López" loading="lazy">
+            <h4>Carlos López</h4>
+            <p>Se especializa en programas educativos inclusivos y en herramientas de accesibilidad para el ámbito hospitalario.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estadísticas -->
+    <section id="estadisticas">
+      <div class="container">
+        <h2 class="section-title">Estadísticas de accesibilidad</h2>
+        <p class="section-lead">Indicadores sobre la atención a personas con discapacidad.</p>
+
+        <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
+          <article class="stat-card">
+            <h3>Accesibilidad en móviles</h3>
+            <div class="stat-number"><span data-count="85">0</span>%</div>
+            <div class="bar" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100" aria-label="Accesibilidad en móviles"><span data-width="85"></span></div>
+            <p>De los pacientes pueden acceder a los servicios mediante aplicaciones móviles adaptadas.</p>
+          </article>
+
+          <article class="stat-card">
+            <h3>Servicios de lengua de señas</h3>
+            <div class="stat-number"><span data-count="70">0</span>%</div>
+            <div class="bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" aria-label="Uso del servicio de lengua de señas"><span data-width="70"></span></div>
+            <p>De los pacientes con discapacidad auditiva usan el servicio de lengua de señas en consulta.</p>
+          </article>
+
+          <article class="stat-card">
+            <h3>Tecnología adaptada</h3>
+            <div class="stat-number"><span data-count="60">0</span>%</div>
+            <div class="bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" aria-label="Áreas con tecnología adaptada"><span data-width="60"></span></div>
+            <p>De las áreas del hospital cuentan con tecnología adaptada para personas con discapacidad.</p>
+          </article>
+
+          <article class="stat-card">
+            <h3>Equipos médicos especializados</h3>
+            <div class="stat-number"><span data-count="90">0</span>%</div>
+            <div class="bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" aria-label="Equipos médicos adaptados"><span data-width="90"></span></div>
+            <p>De los equipos médicos están adaptados para personas con movilidad reducida.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contacto">
+    <div class="container">
+      <h2 style="margin-top:0">Contáctanos</h2>
+      <div class="social-icons">
+        <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram (se abre en una pestaña nueva)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zM17.2 6a1 1 0 1 1-1 1 1 1 0 0 1 1-1z"/></svg>
+        </a>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook (se abre en una pestaña nueva)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.9c0-.9.3-1.5 1.6-1.5h1.7V4.5c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.3H7.7V14h2.7v8h3.1z"/></svg>
+        </a>
+        <a href="https://wa.me/573502606000" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp (se abre en una pestaña nueva)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.900 11.900 0 0 0 4.600 4c1.700.7 2.400.8 3.200.7a2.700 2.700 0 0 0 1.800-1.300 2.200 2.200 0 0 0 .2-1.300c-.1-.1-.3-.2-.5-.3z"/></svg>
+        </a>
+      </div>
+      <small>© <span id="anio"></span> Hospital de Kennedy · Interacción inclusiva</small>
+    </div>
+  </footer>
+
+  <!-- Diálogo de videollamada -->
+  <dialog id="dlg-video" aria-labelledby="dlg-titulo">
+    <h2 id="dlg-titulo">Videollamada</h2>
+    <p>Puedes solicitar una videollamada con el personal del hospital, con apoyo de intérprete de lengua de señas si lo necesitas.</p>
+    <div class="actions">
+      <button type="button" class="btn" id="dlg-cerrar">Cancelar</button>
+      <a class="btn primario" id="dlg-iniciar" href="https://meet.google.com/new" target="_blank" rel="noopener noreferrer">Iniciar videollamada</a>
+    </div>
+  </dialog>
+
+  <script>
+    (() => {
+      'use strict';
+
+      /* ---------- Carrusel ---------- */
+      const slides = [...document.querySelectorAll('.slide')];
+      const dotsBox = document.getElementById('dots');
+      const status = document.getElementById('carousel-status');
+      const toggle = document.getElementById('carousel-toggle');
+      const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let actual = 0, timer = null, enPausa = reducir;
+
+      const dots = slides.map((_, i) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'dot';
+        b.setAttribute('aria-label', `Ir a la imagen ${i + 1}`);
+        b.addEventListener('click', () => { mostrar(i); });
+        dotsBox.appendChild(b);
+        return b;
+      });
+
+      function mostrar(i, anunciar = true) {
+        actual = (i + slides.length) % slides.length;
+        slides.forEach((s, n) => s.classList.toggle('activo', n === actual));
+        dots.forEach((d, n) => d.setAttribute('aria-current', n === actual));
+        if (anunciar && enPausa) status.textContent = `Imagen ${actual + 1} de ${slides.length}`;
+      }
+      function iniciar() { detener(); if (!enPausa) timer = setInterval(() => mostrar(actual + 1, false), 6000); }
+      function detener() { clearInterval(timer); }
+      function actualizarToggle() {
+        toggle.textContent = enPausa ? '▶ Reanudar' : '⏸ Pausar';
+        toggle.setAttribute('aria-label', enPausa ? 'Reanudar carrusel' : 'Pausar carrusel');
+      }
+
+      document.querySelector('.prev').addEventListener('click', () => mostrar(actual - 1));
+      document.querySelector('.next').addEventListener('click', () => mostrar(actual + 1));
+      toggle.addEventListener('click', () => { enPausa = !enPausa; actualizarToggle(); iniciar(); });
+
+      const carrusel = document.querySelector('.carousel');
+      carrusel.addEventListener('mouseenter', detener);
+      carrusel.addEventListener('mouseleave', iniciar);
+      carrusel.addEventListener('focusin', detener);
+      carrusel.addEventListener('focusout', iniciar);
+      carrusel.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') mostrar(actual - 1);
+        if (e.key === 'ArrowRight') mostrar(actual + 1);
+      });
+
+      // Deslizar en móvil
+      let x0 = null;
+      carrusel.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+      carrusel.addEventListener('touchend', e => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0;
+        if (Math.abs(dx) > 40) mostrar(actual + (dx < 0 ? 1 : -1));
+        x0 = null;
+      });
+
+      actualizarToggle(); mostrar(0, false); iniciar();
+
+      /* ---------- Videollamada ---------- */
+      const dlg = document.getElementById('dlg-video');
+      document.getElementById('btn-videollamada').addEventListener('click', () => dlg.showModal());
+      document.getElementById('dlg-cerrar').addEventListener('click', () => dlg.close());
+      document.getElementById('dlg-iniciar').addEventListener('click', () => dlg.close());
+      dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+
+      /* ---------- Accesibilidad: tamaño, contraste, voz ---------- */
+      const root = document.documentElement;
+      let escala = 1;
+      try { escala = parseFloat(localStorage.getItem('escala')) || 1; } catch (_) {}
+      const aplicarEscala = () => {
+        root.style.setProperty('--escala', escala);
+        try { localStorage.setItem('escala', escala); } catch (_) {}
+      };
+      aplicarEscala();
+      document.getElementById('btn-mas').addEventListener('click', () => { escala = Math.min(1.5, +(escala + .1).toFixed(2)); aplicarEscala(); });
+      document.getElementById('btn-menos').addEventListener('click', () => { escala = Math.max(.9, +(escala - .1).toFixed(2)); aplicarEscala(); });
+
+      const btnContraste = document.getElementById('btn-contraste');
+      let alto = false;
+      try { alto = localStorage.getItem('contraste') === '1'; } catch (_) {}
+      const aplicarContraste = () => {
+        document.body.classList.toggle('alto-contraste', alto);
+        btnContraste.setAttribute('aria-pressed', alto);
+        try { localStorage.setItem('contraste', alto ? '1' : '0'); } catch (_) {}
+      };
+      aplicarContraste();
+      btnContraste.addEventListener('click', () => { alto = !alto; aplicarContraste(); });
+
+      const btnLeer = document.getElementById('btn-leer');
+      if (!('speechSynthesis' in window)) {
+        btnLeer.hidden = true;
+      } else {
+        btnLeer.addEventListener('click', () => {
+          if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            btnLeer.setAttribute('aria-pressed', 'false');
+            return;
+          }
+          const u = new SpeechSynthesisUtterance(document.getElementById('contenido').innerText);
+          u.lang = 'es-CO';
+          u.onend = u.onerror = () => btnLeer.setAttribute('aria-pressed', 'false');
+          btnLeer.setAttribute('aria-pressed', 'true');
+          speechSynthesis.speak(u);
+        });
+        window.addEventListener('beforeunload', () => speechSynthesis.cancel());
+      }
+
+      /* ---------- Estadísticas animadas ---------- */
+      const stats = document.getElementById('estadisticas');
+      const animar = () => {
+        stats.querySelectorAll('[data-width]').forEach(b => { b.style.width = b.dataset.width + '%'; });
+        stats.querySelectorAll('[data-count]').forEach(el => {
+          const fin = +el.dataset.count;
+          if (reducir) { el.textContent = fin; return; }
+          const t0 = performance.now(), dur = 1200;
+          const paso = t => {
+            const p = Math.min((t - t0) / dur, 1);
+            el.textContent = Math.round(fin * p);
+            if (p < 1) requestAnimationFrame(paso);
+          };
+          requestAnimationFrame(paso);
+        });
+      };
+      if ('IntersectionObserver' in window) {
+        const obs = new IntersectionObserver(([en]) => {
+          if (en.isIntersecting) { animar(); obs.disconnect(); }
+        }, { threshold: .3 });
+        obs.observe(stats);
+      } else { animar(); }
+
+      document.getElementById('anio').textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>

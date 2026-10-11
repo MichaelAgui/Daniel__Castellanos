@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Videos para aprender Lengua de Señas Colombiana (LSC), Hospital de Kennedy.">
+  <title>Aprende señas · Hospital de Kennedy</title>
+  <link rel="shortcut icon" href="Imagenes/4700e0cf-3410-4232-a77e-bae047c36b6a.webp">
+
+  <style>
+    :root {
+      --azul: #07559b; --azul-oscuro: #063b70; --azul-claro: #dceeff; --azul-borde: #8fc5f5;
+      --fondo: #f0f6fc; --texto: #183153; --texto-suave: #405570;
+      --radio: 16px; --sombra: 0 4px 16px rgba(7, 85, 155, .12); --escala: 1;
+    }
+    body.alto-contraste {
+      --azul: #000; --azul-oscuro: #000; --azul-claro: #fff; --azul-borde: #000;
+      --fondo: #fff; --texto: #000; --texto-suave: #000;
+    }
+    body.alto-contraste header, body.alto-contraste footer { background: #000; color: #ffff00; }
+    body.alto-contraste header *, body.alto-contraste footer * { color: #ffff00; }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; font-size: calc(100% * var(--escala)); }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+           line-height: 1.6; background: var(--fondo); color: var(--texto); }
+    img { max-width: 100%; display: block; }
+    :focus-visible { outline: 3px solid #ffb703; outline-offset: 3px; }
+    .container { width: min(1100px, 100% - 2rem); margin-inline: auto; }
+
+    .skip-link { position: absolute; left: 1rem; top: -4rem; background: #ffb703; color: #000;
+                 padding: .75rem 1rem; border-radius: 8px; font-weight: 700; z-index: 100; }
+    .skip-link:focus { top: 1rem; }
+
+    .a11y-bar { background: var(--azul-oscuro); color: #fff; font-size: .9rem; }
+    .a11y-bar .container { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center;
+                           justify-content: flex-end; padding-block: .4rem; }
+    .a11y-bar span { margin-right: auto; opacity: .9; }
+    .a11y-bar button { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.6);
+                       border-radius: 6px; padding: .3rem .7rem; cursor: pointer; font: inherit; }
+    .a11y-bar button:hover, .a11y-bar button[aria-pressed="true"] { background: #fff; color: var(--azul-oscuro); }
+
+    header { background: linear-gradient(135deg, var(--azul), var(--azul-oscuro)); color: #fff; padding: 2rem 0; }
+    header .container { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+    h1 { margin: 0; font-size: clamp(1.6rem, 4vw, 2.4rem); }
+    .subtitle { margin: .25rem 0 0; opacity: .9; }
+    .btn { display: inline-flex; align-items: center; gap: .5rem; background: #fff; color: var(--azul);
+           border: 2px solid var(--azul-borde); padding: .7rem 1.1rem; border-radius: 10px; font: inherit;
+           font-weight: 600; text-decoration: none; cursor: pointer; transition: background .2s, transform .2s; }
+    .btn:hover { background: var(--azul-borde); color: var(--azul-oscuro); transform: translateY(-2px); }
+
+    section { padding-block: 2.25rem; }
+    h2 { text-align: center; color: var(--azul); font-size: clamp(1.4rem, 3vw, 2rem); margin: 0 0 .5rem; }
+    .lead { text-align: center; color: var(--texto-suave); margin: 0 auto 1.75rem; max-width: 62ch; }
+
+    /* Reproductor principal */
+    .player-wrap { background: #fff; border: 2px solid var(--azul-borde); border-radius: var(--radio);
+                   box-shadow: var(--sombra); overflow: hidden; }
+    .player { position: relative; aspect-ratio: 16 / 9; background: #0b1b2e; }
+    .player iframe, .player .placeholder { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .placeholder { display: grid; place-items: center; color: #fff; text-align: center; padding: 1rem; }
+    .player-info { padding: 1rem 1.25rem; }
+    .player-info h3 { margin: 0 0 .25rem; color: var(--azul); }
+    .player-info p { margin: 0; color: var(--texto-suave); }
+    .player-info .fuente { font-size: .9rem; margin-top: .5rem; }
+    .player-info a { color: var(--azul); font-weight: 600; }
+
+    /* Lista de videos */
+    .grid { display: grid; gap: 1.25rem; margin-top: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    .video-card { background: #fff; border: 2px solid var(--azul-borde); border-radius: var(--radio);
+                  overflow: hidden; text-align: left; padding: 0; cursor: pointer; font: inherit; color: inherit;
+                  transition: transform .25s, box-shadow .25s; display: block; width: 100%; }
+    .video-card:hover { transform: translateY(-4px); box-shadow: var(--sombra); }
+    .video-card[aria-current="true"] { border-color: var(--azul); box-shadow: 0 0 0 3px var(--azul-claro); }
+    .thumb { position: relative; aspect-ratio: 16 / 9; background: var(--azul-claro); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .play { position: absolute; inset: 0; display: grid; place-items: center; }
+    .play span { width: 56px; height: 56px; border-radius: 50%; background: rgba(7,85,155,.9); color: #fff;
+                 display: grid; place-items: center; font-size: 1.4rem; padding-left: 4px; }
+    .video-card .body { padding: 1rem 1.1rem; }
+    .video-card h3 { margin: 0 0 .25rem; font-size: 1.05rem; color: var(--azul); }
+    .video-card p { margin: 0; font-size: .92rem; color: var(--texto-suave); }
+    .tag { display: inline-block; font-size: .75rem; font-weight: 700; background: var(--azul-claro);
+           color: var(--azul); border-radius: 99px; padding: .1rem .6rem; margin-bottom: .4rem; }
+
+    /* Consejos y recursos */
+    .cards { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    .card { background: var(--azul-claro); border: 2px solid var(--azul-borde); border-radius: var(--radio); padding: 1.4rem; }
+    .card h3 { margin: 0 0 .5rem; color: var(--azul); font-size: 1.1rem; }
+    .card p { margin: 0; }
+    .card a { color: var(--azul); font-weight: 600; }
+
+    footer { background: var(--azul-oscuro); color: #fff; padding: 1.5rem 0; text-align: center; }
+    footer a { color: #fff; }
+
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  <div class="a11y-bar" role="region" aria-label="Opciones de accesibilidad">
+    <div class="container">
+      <span>Opciones de accesibilidad</span>
+      <button type="button" id="btn-menos" aria-label="Disminuir tamaño de letra">A−</button>
+      <button type="button" id="btn-mas" aria-label="Aumentar tamaño de letra">A+</button>
+      <button type="button" id="btn-contraste" aria-pressed="false">Alto contraste</button>
+    </div>
+  </div>
+
+  <header>
+    <div class="container">
+      <div>
+        <h1>Aprende señas</h1>
+        <p class="subtitle">Videos de Lengua de Señas Colombiana (LSC) · Hospital de Kennedy</p>
+      </div>
+      <a class="btn" href="index.html">← Volver al inicio</a>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section>
+      <div class="container">
+        <h2>Videos para aprender</h2>
+        <p class="lead">Elige un video de la lista y míralo aquí mismo, sin salir de la página.</p>
+
+        <div class="player-wrap">
+          <div class="player" id="player" aria-live="polite">
+            <div class="placeholder">Cargando videos…</div>
+          </div>
+          <div class="player-info">
+            <h3 id="v-titulo"></h3>
+            <p id="v-desc"></p>
+            <p class="fuente">Fuente: <span id="v-fuente"></span> ·
+              <a id="v-externo" href="#" target="_blank" rel="noopener noreferrer">Si no carga, ábrelo en una pestaña nueva</a></p>
+          </div>
+        </div>
+
+        <div class="grid" id="lista" role="list" aria-label="Lista de videos"></div>
+      </div>
+    </section>
+
+    <section style="background:#fff">
+      <div class="container">
+        <h2>Antes de empezar</h2>
+        <p class="lead">Algunas ideas clave para entender la lengua de señas.</p>
+        <div class="cards">
+          <article class="card">
+            <h3>No es universal</h3>
+            <p>Cada país tiene su propia lengua de señas. En Colombia se usa la Lengua de Señas Colombiana (LSC), reconocida legalmente por la Ley 324 de 1996.</p>
+          </article>
+          <article class="card">
+            <h3>La cara también comunica</h3>
+            <p>Las expresiones faciales y el movimiento del cuerpo hacen parte del mensaje, no solo las manos.</p>
+          </article>
+          <article class="card">
+            <h3>Aplaudir en cultura sorda</h3>
+            <p>El aplauso se hace de forma visual, moviendo las manos en el aire, en lugar de chocarlas.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2>Más recursos oficiales</h2>
+        <p class="lead">Para seguir practicando con material del Instituto Nacional para Sordos (INSOR).</p>
+        <div class="cards">
+          <article class="card">
+            <h3>INSOR Educativo</h3>
+            <p>Más de 600 recursos accesibles en LSC y un diccionario virtual con léxico cotidiano y académico.</p>
+            <p><a href="https://colombiaaprende.edu.co/contenidos/plataforma/recursos-educativos-accesibles-para-comunidades-sordas" target="_blank" rel="noopener noreferrer">Ver recursos ↗</a></p>
+          </article>
+          <article class="card">
+            <h3>Sitio del INSOR</h3>
+            <p>Información, noticias y servicios para la comunidad sorda de Colombia.</p>
+            <p><a href="https://www.insor.gov.co" target="_blank" rel="noopener noreferrer">Ir a insor.gov.co ↗</a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p style="margin:0 0 .5rem"><a href="index.html">Volver al inicio</a></p>
+      <small>© <span id="anio"></span> Hospital de Kennedy · Interacción inclusiva</small>
+    </div>
+  </footer>
+
+  <noscript><p style="text-align:center;padding:1rem">Activa JavaScript para ver los videos.</p></noscript>
+
+  <script>
+    /* ==========================================================
+       LISTA DE VIDEOS
+       Para agregar uno, copia un bloque y cambia los datos:
+         id:     código de YouTube (lo que va después de "v=" en la URL)
+         inicio: segundo donde empieza (opcional)
+       Los videos se reproducen dentro de la página (youtube-nocookie).
+       ========================================================== */
+    const VIDEOS = [
+      {
+        id: 'qnYNgaSQI48',
+        titulo: 'Diccionario de Lengua de Señas con énfasis en salud',
+        descripcion: 'Presentación en lengua de señas del primer diccionario digital de LSC con términos de salud, útil para la comunicación entre personal médico y pacientes sordos.',
+        categoria: 'Salud',
+        fuente: 'Universidad CES'
+      },
+      {
+        id: 'A5IgQVVFIlk',
+        inicio: 370,
+        titulo: 'Saludos y despedidas en LSC',
+        descripcion: 'Taller de acercamiento a la LSC: práctica de vocabulario básico como saludos y despedidas.',
+        categoria: 'Básico',
+        fuente: 'ESAP · Taller de acercamiento a la LSC'
+      }
+    ];
+
+    (() => {
+      'use strict';
+
+      const player = document.getElementById('player');
+      const lista = document.getElementById('lista');
+      const tit = document.getElementById('v-titulo');
+      const desc = document.getElementById('v-desc');
+      const fuente = document.getElementById('v-fuente');
+      const externo = document.getElementById('v-externo');
+      const tarjetas = [];
+
+      function urlEmbed(v, autoplay) {
+        const p = new URLSearchParams({ rel: '0', hl: 'es', cc_load_policy: '1', modestbranding: '1' });
+        if (v.inicio) p.set('start', v.inicio);
+        if (autoplay) p.set('autoplay', '1');
+        return `https://www.youtube-nocookie.com/embed/${v.id}?${p}`;
+      }
+      function urlExterno(v) {
+        return `https://www.youtube.com/watch?v=${v.id}${v.inicio ? '&t=' + v.inicio + 's' : ''}`;
+      }
+
+      function seleccionar(i, autoplay) {
+        const v = VIDEOS[i];
+        const f = document.createElement('iframe');
+        f.src = urlEmbed(v, autoplay);
+        f.title = v.titulo;
+        f.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+        f.allowFullscreen = true;
+        f.loading = 'lazy';
+        f.referrerPolicy = 'strict-origin-when-cross-origin';
+        player.replaceChildren(f);
+
+        tit.textContent = v.titulo;
+        desc.textContent = v.descripcion;
+        fuente.textContent = v.fuente;
+        externo.href = urlExterno(v);
+        tarjetas.forEach((t, n) => t.setAttribute('aria-current', n === i));
+      }
+
+      VIDEOS.forEach((v, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'video-card';
+        b.setAttribute('role', 'listitem');
+        b.setAttribute('aria-label', `Reproducir: ${v.titulo}`);
+        b.innerHTML = `
+          <div class="thumb">
+            <img src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" alt="" loading="lazy">
+            <div class="play" aria-hidden="true"><span>▶</span></div>
+          </div>
+          <div class="body">
+            <span class="tag"></span>
+            <h3></h3>
+            <p></p>
+          </div>`;
+        b.querySelector('.tag').textContent = v.categoria || 'Video';
+        b.querySelector('h3').textContent = v.titulo;
+        b.querySelector('p').textContent = v.fuente;
+        b.addEventListener('click', () => {
+          seleccionar(i, true);
+          player.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        lista.appendChild(b);
+        tarjetas.push(b);
+      });
+
+      if (VIDEOS.length) seleccionar(0, false);
+
+      /* ---------- Accesibilidad (comparte preferencias con index.html) ---------- */
+      const root = document.documentElement;
+      let escala = 1, alto = false;
+      try { escala = parseFloat(localStorage.getItem('escala')) || 1; alto = localStorage.getItem('contraste') === '1'; } catch (_) {}
+      const btnC = document.getElementById('btn-contraste');
+      const aplicar = () => {
+        root.style.setProperty('--escala', escala);
+        document.body.classList.toggle('alto-contraste', alto);
+        btnC.setAttribute('aria-pressed', alto);
+        try { localStorage.setItem('escala', escala); localStorage.setItem('contraste', alto ? '1' : '0'); } catch (_) {}
+      };
+      aplicar();
+      document.getElementById('btn-mas').addEventListener('click', () => { escala = Math.min(1.5, +(escala + .1).toFixed(2)); aplicar(); });
+      document.getElementById('btn-menos').addEventListener('click', () => { escala = Math.max(.9, +(escala - .1).toFixed(2)); aplicar(); });
+      btnC.addEventListener('click', () => { alto = !alto; aplicar(); });
+
+      document.getElementById('anio').textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>
